@@ -2,13 +2,17 @@ import map.mapTypes.GrassField;
 import map.mapTypes.IWorldMap;
 import map.visualization.OptionParser;
 import map.mapTypes.RectangularMap;
+import mapElements.animals.Genotype;
 import mapElements.positionAndDirection.MoveDirection;
 import mapElements.positionAndDirection.Vector2d;
 import mapElements.animals.Animal;
 
+import java.util.Arrays;
+
 
 public class World {
     public static void main(String [] args) {
+        /*
         try {
             MoveDirection[] directions = new OptionParser(args).getValidArgTable();
             IWorldMap map = new RectangularMap(10, 5);
@@ -28,6 +32,13 @@ public class World {
         catch (Exception e) {
             System.out.println( e );
         }
-
+        */
+        Genotype type1 = new Genotype();
+        Genotype type2 = new Genotype();
+        System.out.println(type1);
+        System.out.println(type2);
+        Genotype child = new Genotype(type1, type2);
+        System.out.println(child);
     }
 }
+

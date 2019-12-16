@@ -2,8 +2,12 @@ package mapElements.positionAndDirection;
 
 public enum MapDirection {
     NORTH,
+    NORTHWEST,
     SOUTH,
+    SOUTHWEST,
     WEST,
+    NORTHEAST,
+    SOUTHEAST,
     EAST;
 
     public String toString()
@@ -13,6 +17,10 @@ public enum MapDirection {
             case WEST: return "Zachód";
             case NORTH: return "Północ";
             case SOUTH: return "Południe";
+            case NORTHEAST: return "Północny wschód";
+            case SOUTHEAST: return "Południowy wcchód";
+            case SOUTHWEST: return "Południowy zachód";
+            case NORTHWEST: return "Północny zachód";
         }
         return null;
     }
@@ -43,6 +51,10 @@ public enum MapDirection {
             case WEST: return new Vector2d(-1, 0);
             case NORTH: return new Vector2d(0, 1);
             case SOUTH: return new Vector2d(0, -1);
+            case NORTHWEST: return new Vector2d(-1 ,1);
+            case NORTHEAST: return new Vector2d(1,1);
+            case SOUTHEAST: return new Vector2d(1,-1);
+            case SOUTHWEST: return  new Vector2d(-1, -1);
         }
         return null;
     }

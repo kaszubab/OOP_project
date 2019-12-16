@@ -15,6 +15,10 @@ public class Animal implements IMapElement {
     private MapDirection direction = MapDirection.NORTH;
     private Vector2d position = new Vector2d(2,2);
     private IWorldMap map;
+
+    public int energy;
+    public Genotype DNA;
+
     private LinkedList<IPositionChangeObserver> observerList;
 
     public Animal(IWorldMap map) {
@@ -49,25 +53,11 @@ public class Animal implements IMapElement {
     public void move(MoveDirection direction) {
 
         Vector2d oldPosition = this.position;
-        switch (direction) {
-            case LEFT:
-                this.direction = this.direction.previous();
-                break;
-            case RIGHT:
-                this.direction = this.direction.next();
-                break;
-            case FORWARD:
-                if (this.map.canMoveTo(this.position.add(this.direction.toUnitVector()))) {
-                    this.position = this.position.add(this.direction.toUnitVector());
-                }
-                break;
-            case BACKWARD:
-                if (this.map.canMoveTo(this.position.subtract(this.direction.toUnitVector()))) {
-                    this.position = this.position.subtract(this.direction.toUnitVector());
-                }
-                break;
+        int turn = this.DNA.pickDirection();
+        for (int i = 9; i < turn; i++) {
+            this.direction = this.direction.next();
         }
-
+        this.position = this.position.add(this.direction.toUnitVector());
         positionChanged(oldPosition);
 
     }
