@@ -1,7 +1,8 @@
 package map;
 
+import mapElements.animals.Animal;
 import mapElements.positionAndDirection.Vector2d;
 
 public interface IPositionChangeObserver {
-    void positionChanged(Vector2d oldPosition, Vector2d newPosition);
+    void positionChanged(Vector2d oldPosition, Animal animal);
 }

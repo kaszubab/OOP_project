@@ -1,5 +1,5 @@
 package map.mapTypes;
-
+/*
 import map.visualization.MapVisualizer;
 import mapElements.otherElements.Grass;
 import mapElements.IMapElement;
@@ -61,3 +61,4 @@ public class GrassField  extends AbstractWorldMap {
 
 
 }
+*/

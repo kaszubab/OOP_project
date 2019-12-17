@@ -6,25 +6,29 @@ import mapElements.animals.Animal;
 import mapElements.positionAndDirection.Vector2d;
 
 
-public class RectangularMap extends AbstractWorldMap {
+public class WorldMap extends AbstractWorldMap {
+
     private int width;
     private int height;
+    private Vector2d jungleRightUpper;
+    private Vector2d JungleLeftLower;
+    private int grassInSavannah;
+    private int grassInJungle;
+    private int jungleCapacity;
+    private int savannahCapacity;
 
-    public RectangularMap(Integer width, Integer height) {
+    public WorldMap(int width, int height, int jungleSize) {
         this.width = width;
         this.height = height;
-        mapVis = new MapVisualizer(this);
+
+        this.jungleRightUpper = new Vector2d(width/2 + jungleSize/2, height/2 + jungleSize/2);
+        this.JungleLeftLower = new Vector2d(width/2 - jungleSize/2, height/2 - jungleSize/2);
+        this.mapVis = new MapVisualizer(this);
     }
 
     private boolean inMap(Vector2d position) {
         return position.precedes(new Vector2d(width,height)) &&
                 position.follows(new Vector2d(0,0));
-    }
-
-    @Override
-    public boolean canMoveTo(Vector2d position) {
-        if (inMap(position)) return super.canMoveTo(position);
-        return false;
     }
 
     @Override

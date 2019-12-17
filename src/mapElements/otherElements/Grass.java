@@ -5,7 +5,7 @@ import mapElements.positionAndDirection.MapDirection;
 import mapElements.positionAndDirection.Vector2d;
 
 public class Grass implements IMapElement {
-    private MapDirection direction = MapDirection.NORTH;
+
     private Vector2d position;
 
 

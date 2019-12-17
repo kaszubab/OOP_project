@@ -3,10 +3,9 @@ import mapElements.positionAndDirection.Vector2d;
 import map.visualization.OptionParser;
 import mapElements.animals.Animal;
 import map.mapTypes.IWorldMap;
-import map.mapTypes.GrassField;
 import org.junit.Assert;
 import org.junit.Test;
-
+/*
 public class GrassFieldTest {
     @Test
     public void testMap() {
@@ -79,3 +78,4 @@ public class GrassFieldTest {
 
     }
 }
+*/

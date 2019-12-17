@@ -19,10 +19,10 @@ public interface IWorldMap {
      *            The position checked for the movement possibility.
      * @return True if the object can move to that position.
      */
-    boolean canMoveTo(Vector2d position);
+    boolean canPlace(Vector2d position);
 
     /**
-     * Place a animal on the map.
+     * Place a aplant on the map.
      *
      * @param animal
      *            The animal to place on the map.
@@ -37,7 +37,7 @@ public interface IWorldMap {
      * @param directions
      *            Array of move directions.
      */
-    void run(MoveDirection[] directions);
+    void run();
 
     /**
      * Return true if given position on the map is occupied. Should not be

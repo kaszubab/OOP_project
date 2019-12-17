@@ -1,7 +1,6 @@
 package map.mapTypes;
 
 import map.IPositionChangeObserver;
-import map.visualization.MapBoundary;
 import map.visualization.MapVisualizer;
 import mapElements.IMapElement;
 import mapElements.positionAndDirection.MoveDirection;
@@ -10,12 +9,13 @@ import mapElements.animals.Animal;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 
 public abstract class  AbstractWorldMap implements IWorldMap, IPositionChangeObserver {
-    protected List<IMapElement> animalList = new ArrayList<>();
-    protected HashMap<Vector2d,IMapElement> elementMap = new HashMap<>();
-    protected MapBoundary mBoundary = new MapBoundary();
+
+    protected List<Animal> animalList = new ArrayList<>();
+    protected HashMap<Vector2d,List<IMapElement>> elementMap = new HashMap<>();
     protected MapVisualizer mapVis;
 
     @Override
@@ -23,42 +23,33 @@ public abstract class  AbstractWorldMap implements IWorldMap, IPositionChangeObs
         return objectAt(position) != null;
     }
 
-    public boolean canMoveTo(Vector2d position) {
-        return !isOccupied(position);
-    }
 
     public boolean place(Animal animal) {
-        if (!isOccupied(animal.getPosition())) {
-            animalList.add(animal);
-            elementMap.put(animal.getPosition(),animal);
-            mBoundary.addObject(animal.getPosition());
-            animal.addObserver(mBoundary);
-            animal.addObserver(this);
-            return true;
-        }
-        throw new IllegalArgumentException(" Position " + animal.getPosition() + " is already occupied");
+        animalList.add(animal);
+        elementMap.computeIfAbsent(animal.getPosition(), k -> new LinkedList<>());
+        elementMap.get(animal.getPosition()).add(animal);
+        animal.addObserver(this);
+        return true;
     }
 
-    public void run(MoveDirection[] directions) {
-        for (int i = 0; i < directions.length; i++) {
-            Animal animal = (Animal) animalList.get(i % animalList.size());
-
-            animal.move(directions[i]);
-
+    public void run() {
+        for (Animal x : animalList) {
+            x.move();
         }
     }
+
+    public void positionChanged(Vector2d oldPosition, Animal movingAnimal) {
+        elementMap.get(oldPosition).remove(movingAnimal);
+        elementMap.computeIfAbsent(movingAnimal.getPosition(), k -> new LinkedList<>());
+        elementMap.get(movingAnimal.getPosition()).add(movingAnimal);
+    }
+
+    protected abstract Vector2d minPoint();
+    protected abstract Vector2d maxPoint();
 
     @Override
-    public void positionChanged(Vector2d oldPosition, Vector2d newPosition) {
-        IMapElement element = elementMap.remove(oldPosition);
-        elementMap.put(newPosition,element);
-    }
-
-    protected Vector2d minPoint() {
-        return new Vector2d(mBoundary.xMin().x,mBoundary.yMin().y);
-    };
-    protected Vector2d maxPoint() {
-        return new Vector2d(mBoundary.xMax().x,mBoundary.yMax().y);
+    public boolean canPlace(Vector2d position) {
+        return elementMap.get(position).isEmpty();
     }
 
     public Object objectAt(Vector2d position) {
