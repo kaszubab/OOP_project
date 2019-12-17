@@ -63,16 +63,28 @@ public class Animal implements IMapElement {
         return new Vector2d(0,0).add(this.position);
     }
 
-    public void move() {
+    public void move(Vector2d minimalBoundary, Vector2d maxBoundary) {
 
         Vector2d oldPosition = this.position;
         int turn = this.DNA.pickDirection();
 
-        for (int i = 9; i < turn; i++) {
+        System.out.println(this.direction);
+        for (int i = 0; i < turn; i++) {
             this.direction = this.direction.next();
         }
 
+        int futureX, futureY;
         this.position = this.position.add(this.direction.toUnitVector());
+
+        if (this.position.x > maxBoundary.x ) futureX = minimalBoundary.x;
+        else if (this.position.x < minimalBoundary.x) futureX = maxBoundary.x-1;
+        else futureX = this.position.x;
+
+        if (this.position.y > maxBoundary.y ) futureY = minimalBoundary.y;
+        else if (this.position.y < minimalBoundary.y) futureY = maxBoundary.y-1;
+        else futureY = this.position.y;
+
+        this.position = new Vector2d(futureX, futureY);
         positionChanged(oldPosition);
     }
 
@@ -102,13 +114,21 @@ public class Animal implements IMapElement {
         // lab 3 return "Position " + position +" direction " + direction;
         switch (this.direction) {
             case SOUTH:
-                return "S";
+                return "4";
             case NORTH:
-                return "N";
+                return "0";
             case WEST:
-                return "W";
+                return "6";
             case EAST:
-                return "E";
+                return "2";
+            case NORTHEAST:
+                return "1";
+            case SOUTHEAST:
+                return "3";
+            case SOUTHWEST:
+                return "5";
+            case NORTHWEST:
+                return "7";
         }
         return null;
     }

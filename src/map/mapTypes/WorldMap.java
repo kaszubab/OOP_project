@@ -12,10 +12,6 @@ public class WorldMap extends AbstractWorldMap {
     private int height;
     private Vector2d jungleRightUpper;
     private Vector2d JungleLeftLower;
-    private int grassInSavannah;
-    private int grassInJungle;
-    private int jungleCapacity;
-    private int savannahCapacity;
 
     public WorldMap(int width, int height, int jungleSize) {
         this.width = width;
@@ -33,7 +29,7 @@ public class WorldMap extends AbstractWorldMap {
 
     @Override
     public boolean place(Animal animal) {
-        if ( inMap(animal.getPosition())) return super.place( animal);
+        if ( inMap(animal.getPosition())) return super.place(animal);
         return false;
     }
 

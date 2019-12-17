@@ -20,13 +20,13 @@ public abstract class  AbstractWorldMap implements IWorldMap, IPositionChangeObs
 
     @Override
     public boolean isOccupied(Vector2d position) {
-        return objectAt(position) != null;
+        return elementMap.computeIfPresent(position, (k,a) -> a.isEmpty() ? null : a )  != null;
     }
 
 
     public boolean place(Animal animal) {
         animalList.add(animal);
-        elementMap.computeIfAbsent(animal.getPosition(), k -> new LinkedList<>());
+        elementMap.putIfAbsent(animal.getPosition(), new LinkedList<>());
         elementMap.get(animal.getPosition()).add(animal);
         animal.addObserver(this);
         return true;
@@ -34,13 +34,13 @@ public abstract class  AbstractWorldMap implements IWorldMap, IPositionChangeObs
 
     public void run() {
         for (Animal x : animalList) {
-            x.move();
+            x.move(this.minPoint(), this.maxPoint());
         }
     }
 
     public void positionChanged(Vector2d oldPosition, Animal movingAnimal) {
         elementMap.get(oldPosition).remove(movingAnimal);
-        elementMap.computeIfAbsent(movingAnimal.getPosition(), k -> new LinkedList<>());
+        elementMap.putIfAbsent(movingAnimal.getPosition(), new LinkedList<>());
         elementMap.get(movingAnimal.getPosition()).add(movingAnimal);
     }
 

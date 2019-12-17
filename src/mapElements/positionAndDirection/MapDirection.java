@@ -42,10 +42,14 @@ public enum MapDirection {
 
     public MapDirection next() {
         switch (this) {
-            case EAST: return SOUTH;
-            case WEST: return NORTH;
-            case NORTH: return EAST;
-            case SOUTH: return WEST;
+            case EAST: return SOUTHEAST;
+            case WEST: return NORTHWEST;
+            case NORTH: return NORTHEAST;
+            case SOUTH: return SOUTHWEST;
+            case NORTHWEST: return NORTH;
+            case SOUTHWEST: return WEST;
+            case SOUTHEAST: return SOUTH;
+            case NORTHEAST: return  EAST;
         }
         return null;
     }
