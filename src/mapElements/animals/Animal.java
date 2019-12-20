@@ -68,7 +68,6 @@ public class Animal implements IMapElement {
         Vector2d oldPosition = this.position;
         int turn = this.DNA.pickDirection();
 
-        System.out.println(this.direction);
         for (int i = 0; i < turn; i++) {
             this.direction = this.direction.next();
         }
