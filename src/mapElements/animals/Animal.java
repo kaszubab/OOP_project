@@ -111,7 +111,7 @@ public class Animal implements IMapElement {
 
     public String toString() {
         // lab 3 return "Position " + position +" direction " + direction;
-        switch (this.direction) {
+        /*switch (this.direction) {
             case SOUTH:
                 return "4";
             case NORTH:
@@ -129,6 +129,7 @@ public class Animal implements IMapElement {
             case NORTHWEST:
                 return "7";
         }
-        return null;
+        return null;*/
+        return Integer.toString(this.energy);
     }
 }

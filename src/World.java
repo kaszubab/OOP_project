@@ -1,10 +1,14 @@
 import com.sun.org.apache.xerces.internal.util.SynchronizedSymbolTable;
 import map.mapTypes.WorldMap;
+import mapElements.IMapElement;
 import mapElements.animals.Genotype;
 import mapElements.animals.Animal;
+import mapElements.otherElements.Grass;
 import mapElements.positionAndDirection.Vector2d;
 
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 
@@ -32,15 +36,14 @@ public class World {
             System.out.println( e );
         }
         */
-        WorldMap map = new WorldMap(15,15,10);
-        map.place(new Animal(new Vector2d(10,10),0));
-        map.place(new Animal(new Vector2d(5,5),0));
-        map.place(new Animal(new Vector2d(5,5),0));
-        map.place(new Animal(new Vector2d(5,5),0));
-        map.place(new Animal(new Vector2d(5,5),0));
+
+        WorldMap map = new WorldMap(5,5,2, 5);
+        map.place(new Animal(new Vector2d(2,2),10));
+        map.place(new Animal(new Vector2d(2,2),10));
+        map.place(new Animal(new Vector2d(2,2),10));
         while (true){
             try {
-                Thread.sleep(250);
+                Thread.sleep(1000);
             }
             catch (Exception e) {
                 System.out.println(e);
@@ -49,7 +52,6 @@ public class World {
             map.run();
             System.out.println(map);
         }
-
     }
 }
 

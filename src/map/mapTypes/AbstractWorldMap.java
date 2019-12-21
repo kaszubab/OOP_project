@@ -32,11 +32,8 @@ public abstract class  AbstractWorldMap implements IWorldMap, IPositionChangeObs
         return true;
     }
 
-    public void run() {
-        for (Animal x : animalList) {
-            x.move(this.minPoint(), this.maxPoint());
-        }
-    }
+    public abstract void run();
+
 
     public void positionChanged(Vector2d oldPosition, Animal movingAnimal) {
         elementMap.get(oldPosition).remove(movingAnimal);
