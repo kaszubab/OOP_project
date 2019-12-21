@@ -19,14 +19,18 @@ public class WorldMap extends AbstractWorldMap {
     private int width;
     private int height;
     private int plantEnergy;
+    private int moveCost;
+
     private Vector2d jungleRightUpper;
     private Vector2d jungleLeftLower;
     private LinkedList<IMapElement> grassList = new LinkedList<>();
 
-    public WorldMap(int width, int height, int jungleSize, int plantEnergy) {
+    public WorldMap(int width, int height, int jungleSize, int plantEnergy, int moveCost) {
         this.width = width;
         this.height = height;
         this.plantEnergy = plantEnergy;
+        this.moveCost = moveCost;
+
         this.jungleRightUpper = new Vector2d(width/2 + jungleSize/2, height/2 + jungleSize/2);
         this.jungleLeftLower = new Vector2d(width/2 - jungleSize/2, height/2 - jungleSize/2);
         this.mapVis = new MapVisualizer(this);
@@ -51,16 +55,18 @@ public class WorldMap extends AbstractWorldMap {
         }
         tries = 0;
         while (true) {
-            Vector2d newPosition = new Vector2d(rand.nextInt(this.jungleRightUpper.x - this.jungleLeftLower.x ) + this.jungleLeftLower.x
-                    , rand.nextInt(this.jungleRightUpper.y - jungleLeftLower.y) + this.jungleLeftLower.y);
+            Vector2d newPosition = new Vector2d(rand.nextInt(this.jungleRightUpper.x - this.jungleLeftLower.x +1) + this.jungleLeftLower.x
+                    , rand.nextInt(this.jungleRightUpper.y - jungleLeftLower.y+1) + this.jungleLeftLower.y);
             if (tries++ > (jungleRightUpper.x - this.jungleLeftLower.x) * (this.jungleRightUpper.y - this.jungleLeftLower.y) || placeGrass(newPosition)) break;
         }
     }
 
     public void run() {
+        killAnimals();
         growGrass();
         for (Animal x : animalList) {
             x.move(this.minPoint(), this.maxPoint());
+            x.changeEnergy(-moveCost);
         }
         feedAnimals();
 
@@ -97,7 +103,7 @@ public class WorldMap extends AbstractWorldMap {
     public void giveAnimalsFood(List<IMapElement> list,  IMapElement grass) {
         list.remove(((Grass)grass));
         if (list.size() == 1) {
-            ((Animal) list.get(0)).energy += this.plantEnergy;
+            ((Animal) list.get(0)).changeEnergy(this.plantEnergy);
             return;
         }
         list.sort((x,y) -> {
@@ -115,8 +121,19 @@ public class WorldMap extends AbstractWorldMap {
             if (((Animal) x).energy == ((LinkedList<Animal>) strongestAnimals).getFirst().energy) strongestAnimals.add(((Animal) x));
         });
         ((LinkedList<Animal>) strongestAnimals).removeFirst();
-        strongestAnimals.forEach(x -> x.energy += this.plantEnergy / strongestAnimals.size());
+        strongestAnimals.forEach(x -> x.changeEnergy( this.plantEnergy / strongestAnimals.size()));
 
+    }
+
+    private void killAnimals() {
+        List<Animal> animalsToBeKilled = new LinkedList<>();
+        this.animalList.forEach(x -> {
+            if (x.dead()) {
+                animalsToBeKilled.add(x);
+                this.elementMap.get(x.getPosition()).remove(x);
+            }
+        });
+        this.animalList.removeAll(animalsToBeKilled);
     }
 
 

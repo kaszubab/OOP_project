@@ -37,13 +37,22 @@ public class World {
         }
         */
 
-        WorldMap map = new WorldMap(5,5,2, 5);
+        WorldMap map = new WorldMap(5,5,2, 10, 5);
+        map.place(new Animal(new Vector2d(2,2),10));
+        map.place(new Animal(new Vector2d(2,2),10));
+        map.place(new Animal(new Vector2d(2,2),10));
+        map.place(new Animal(new Vector2d(2,2),10));
+        map.place(new Animal(new Vector2d(2,2),10));
+        map.place(new Animal(new Vector2d(2,2),10));
+        map.place(new Animal(new Vector2d(2,2),10));
+        map.place(new Animal(new Vector2d(2,2),10));
+        map.place(new Animal(new Vector2d(2,2),10));
         map.place(new Animal(new Vector2d(2,2),10));
         map.place(new Animal(new Vector2d(2,2),10));
         map.place(new Animal(new Vector2d(2,2),10));
         while (true){
             try {
-                Thread.sleep(1000);
+                Thread.sleep(10);
             }
             catch (Exception e) {
                 System.out.println(e);
