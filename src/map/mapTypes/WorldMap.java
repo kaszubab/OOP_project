@@ -1,6 +1,13 @@
 package map.mapTypes;
 
 
+import javafx.geometry.Pos;
+import javafx.scene.Parent;
+import javafx.scene.layout.Background;
+import javafx.scene.layout.Pane;
+import javafx.scene.layout.StackPane;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.Rectangle;
 import map.visualization.MapVisualizer;
 import mapElements.IMapElement;
 import mapElements.animals.Animal;
@@ -11,12 +18,22 @@ import javax.swing.*;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
+import java.util.Vector;
 import java.util.stream.Stream;
 
 
 public class WorldMap extends AbstractWorldMap {
 
+    public int getWidth() {
+        return width;
+    }
+
     private int width;
+
+    public int getHeight() {
+        return height;
+    }
+
     private int height;
     private int plantEnergy;
     private int moveCost;
@@ -24,6 +41,7 @@ public class WorldMap extends AbstractWorldMap {
     private Vector2d jungleRightUpper;
     private Vector2d jungleLeftLower;
     private LinkedList<IMapElement> grassList = new LinkedList<>();
+
 
     public WorldMap(int width, int height, int jungleSize, int plantEnergy, int moveCost) {
         this.width = width;
@@ -68,7 +86,23 @@ public class WorldMap extends AbstractWorldMap {
             x.move(this.minPoint(), this.maxPoint());
             x.changeEnergy(-moveCost);
         }
+
+        animalList.forEach(x -> {
+            List<IMapElement> list = elementMap.get(x.getPosition());
+            list.sort((y1,y2) -> {
+                if (y1 instanceof Grass) return -1;
+                if (y2 instanceof Grass) return 1;
+                if (((Animal) y1).energy < ((Animal) y2).energy)
+                    return -1;
+                else if (((Animal) y1).energy == ((Animal) y2).energy)
+                    return 0;
+                else
+                    return -1;
+            });
+        });
+
         feedAnimals();
+        bearChildren();
 
     }
 
@@ -102,24 +136,19 @@ public class WorldMap extends AbstractWorldMap {
 
     public void giveAnimalsFood(List<IMapElement> list,  IMapElement grass) {
         list.remove(((Grass)grass));
+
         if (list.size() == 1) {
             ((Animal) list.get(0)).changeEnergy(this.plantEnergy);
             return;
         }
-        list.sort((x,y) -> {
-            if (((Animal) x).energy < ((Animal) y).energy)
-                return -1;
-            else if (((Animal) x).energy == ((Animal) y).energy)
-                return 0;
-            else
-                return -1;
-        });
+
         List<Animal> strongestAnimals = new LinkedList<>();
         strongestAnimals.add((Animal) list.get(0));
 
         list.forEach( x -> {
             if (((Animal) x).energy == ((LinkedList<Animal>) strongestAnimals).getFirst().energy) strongestAnimals.add(((Animal) x));
         });
+
         ((LinkedList<Animal>) strongestAnimals).removeFirst();
         strongestAnimals.forEach(x -> x.changeEnergy( this.plantEnergy / strongestAnimals.size()));
 
@@ -133,7 +162,74 @@ public class WorldMap extends AbstractWorldMap {
                 this.elementMap.get(x.getPosition()).remove(x);
             }
         });
+
         this.animalList.removeAll(animalsToBeKilled);
+    }
+
+    private void bearChildren() {
+        List<Animal> animalsToAdd = new LinkedList<>();
+        animalList.forEach( animal -> {
+            List<IMapElement> list = elementMap.get(animal.getPosition());
+            if (list.size() <= 1) return;
+            if ( ((Animal)list.get(0) ).canCopulate() && ( (Animal) list.get(1)).canCopulate() ) {
+                Vector2d placeForChildren = animal.getPosition();
+                for (int i = -1; i < 2; i++) {
+                    for (int j = -1; j < 2; j++) {
+                        Vector2d newPlaceForChildren = new Vector2d(animal.getPosition().x + i, animal.getPosition().y + j);
+                        if (this.inMap(newPlaceForChildren) &&
+                                (!this.elementMap.containsKey(newPlaceForChildren) ||
+                                 this.elementMap.get(newPlaceForChildren).size()  == 0)) {
+                            placeForChildren = newPlaceForChildren;
+                            Animal child =  ((Animal)list.get(0) ).copulate(( (Animal) list.get(1)), placeForChildren);
+                            animalsToAdd.add(child);
+                            return;
+                        }
+                    }
+                }
+                Animal child =  ((Animal)list.get(0) ).copulate(( (Animal) list.get(1)), placeForChildren);
+                animalsToAdd.add(child);
+            }
+        });
+        animalsToAdd.forEach(x -> this.place(x));
+    }
+
+
+
+    public Parent visualize() {
+        Pane root = new Pane();
+        root.setPrefSize(800, 800);
+
+        for (int i = 0; i < this.width; i++) {
+            for (int j = 0; j < this.height; j++) {
+                Tile tile;
+                if ( i >= this.jungleLeftLower.x && i <= this.jungleRightUpper.x &&
+                        j <= this.jungleRightUpper.y && j >= this.jungleLeftLower.y) {
+                    tile = new Tile(800 / this.getWidth(), 800 / this.getHeight(), Color.LIGHTGREEN);
+                }
+                else {
+                    tile = new Tile(800 / this.getWidth(), 800 / this.getHeight(), null);
+                }
+
+                tile.setTranslateX(i * 800 / this.getWidth());
+                tile.setTranslateY(j * 800 / this.getHeight());
+                System.out.println("Added");
+                root.getChildren().add(tile);
+            }
+        }
+
+        return root;
+    }
+
+
+    private class Tile extends StackPane {
+        public Tile(int x, int y, Color color) {
+            Rectangle border = new Rectangle(x, y);
+            border.setFill(color);
+
+            border.setStroke(Color.BLACK);
+            setAlignment(Pos.CENTER);
+            getChildren().addAll(border);
+        }
     }
 
 

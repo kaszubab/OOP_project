@@ -20,6 +20,7 @@ public class Animal implements IMapElement {
     private int children = 0;
     public static int maxEnergy;
     public int energy;
+    private boolean copulated;
 
     private LinkedList<IPositionChangeObserver> observerList;
 
@@ -84,6 +85,8 @@ public class Animal implements IMapElement {
         else futureY = this.position.y;
 
         this.position = new Vector2d(futureX, futureY);
+        this.copulated = false;
+
         positionChanged(oldPosition);
     }
 
@@ -100,12 +103,18 @@ public class Animal implements IMapElement {
     }
 
     public boolean canCopulate() {
-        return this.energy >= this.maxEnergy;
+        return this.energy >= this.maxEnergy && !this.copulated;
     }
 
     public Animal copulate( Animal partner, Vector2d birthPlace) {
         this.children++;
-        return new Animal(new Vector2d(birthPlace.x, birthPlace.y), this.energy / 4 + partner.energy / 4, new Genotype(this.DNA, partner.DNA));
+        this.copulated = true;
+        partner.copulated = true;
+        Animal newAnimal =  new Animal(new Vector2d(birthPlace.x, birthPlace.y),
+                this.energy / 4 + partner.energy / 4, new Genotype(this.DNA, partner.DNA));
+        this.changeEnergy(-this.energy/4);
+        partner.changeEnergy(-partner.energy/4);
+        return newAnimal;
     }
 
 
