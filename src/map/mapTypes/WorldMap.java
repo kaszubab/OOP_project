@@ -38,10 +38,10 @@ public class WorldMap extends AbstractWorldMap {
     private int plantEnergy;
     private int moveCost;
 
-    private Vector2d jungleRightUpper;
-    private Vector2d jungleLeftLower;
+    protected Vector2d jungleRightUpper;
+    protected Vector2d jungleLeftLower;
     private LinkedList<IMapElement> grassList = new LinkedList<>();
-
+    private List<MapGUIVisualizer> visualizer = new LinkedList<>();
 
     public WorldMap(int width, int height, int jungleSize, int plantEnergy, int moveCost) {
         this.width = width;
@@ -104,6 +104,7 @@ public class WorldMap extends AbstractWorldMap {
         feedAnimals();
         bearChildren();
 
+        elementMap.forEach( (x,y) -> recolorTile(x, y) );
     }
 
     @Override
@@ -193,46 +194,22 @@ public class WorldMap extends AbstractWorldMap {
         animalsToAdd.forEach(x -> this.place(x));
     }
 
-
-
-    public Parent visualize() {
-        Pane root = new Pane();
-        root.setPrefSize(800, 800);
-
-        for (int i = 0; i < this.width; i++) {
-            for (int j = 0; j < this.height; j++) {
-                Tile tile;
-                if ( i >= this.jungleLeftLower.x && i <= this.jungleRightUpper.x &&
-                        j <= this.jungleRightUpper.y && j >= this.jungleLeftLower.y) {
-                    tile = new Tile(800 / this.getWidth(), 800 / this.getHeight(), Color.LIGHTGREEN);
-                }
-                else {
-                    tile = new Tile(800 / this.getWidth(), 800 / this.getHeight(), null);
-                }
-
-                tile.setTranslateX(i * 800 / this.getWidth());
-                tile.setTranslateY(j * 800 / this.getHeight());
-                System.out.println("Added");
-                root.getChildren().add(tile);
-            }
-        }
-
-        return root;
+    public void addVisualizer (MapGUIVisualizer vis) {
+        this.visualizer.add(vis);
     }
 
-
-    private class Tile extends StackPane {
-        public Tile(int x, int y, Color color) {
-            Rectangle border = new Rectangle(x, y);
-            border.setFill(color);
-
-            border.setStroke(Color.BLACK);
-            setAlignment(Pos.CENTER);
-            getChildren().addAll(border);
+    private void recolorTile(Vector2d x, List<IMapElement> list) {
+        if (list.isEmpty()) {
+            if (inJungle(x)) visualizer.forEach( y -> y.recolorTile(x, Color.LIGHTGREEN));
+            else visualizer.forEach( y -> y.recolorTile(x, null));
+        }
+        else if (this.elementMap.get(x).get(0) instanceof Grass) {
+            visualizer.forEach( y -> y.recolorTile(x, Color.DARKGREEN));
+        }
+        else {
+            visualizer.forEach( y -> y.recolorTile(x, Color.FUCHSIA));
         }
     }
-
-
 
     @Override
     protected Vector2d minPoint() {

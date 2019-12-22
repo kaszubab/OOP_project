@@ -1,5 +1,9 @@
 import com.sun.org.apache.xerces.internal.util.SynchronizedSymbolTable;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
 import javafx.application.Application;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.geometry.Pos;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -9,6 +13,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
 import javafx.scene.control.Button;
+import map.mapTypes.MapGUIVisualizer;
 import map.mapTypes.WorldMap;
 import mapElements.IMapElement;
 import mapElements.animals.Genotype;
@@ -17,10 +22,12 @@ import mapElements.otherElements.Grass;
 import mapElements.positionAndDirection.Vector2d;
 
 import java.awt.*;
+import java.time.Duration;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 
 
 public class World extends Application {
@@ -62,19 +69,41 @@ public class World extends Application {
             System.out.println(map);
         }*/
         launch(args);
+
     }
 
+    private Stage window;
     @Override
     public void start(Stage primaryStage) {
         WorldMap map = new WorldMap(25,25,4, 10, 0);
-        map.place(new Animal(new Vector2d(1,1),10));
-        map.place(new Animal(new Vector2d(1,1),10));
+        map.place(new Animal(new Vector2d(2,2), 20));
+        map.place(new Animal(new Vector2d(8,8), 20));
+        map.place(new Animal(new Vector2d(5,7), 20));
+        map.place(new Animal(new Vector2d(11,9), 20));
+        map.place(new Animal(new Vector2d(19,21), 20));
 
-        primaryStage.setTitle("Evolution generator");
-        Scene sc = new Scene(map.visualize());
-        primaryStage.setScene(sc);
 
-        primaryStage.show();
+        MapGUIVisualizer visualizer = new MapGUIVisualizer(map);
+
+        window = primaryStage;
+
+        window.setTitle("Evolution generator");
+
+        AtomicInteger counter = new AtomicInteger();
+        Timeline timeline = new Timeline(new KeyFrame(javafx.util.Duration.seconds(0.5), new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                window.setScene(new Scene(visualizer.getVisualization()));
+                map.run();
+            }
+        }));
+        timeline.setCycleCount(Timeline.INDEFINITE);
+        timeline.play();
+
+
+        window.show();
+
+
     }
 
     private Parent createContent(WorldMap map) {
