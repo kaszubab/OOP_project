@@ -77,11 +77,11 @@ public class Animal implements IMapElement {
         this.position = this.position.add(this.direction.toUnitVector());
 
         if (this.position.x > maxBoundary.x ) futureX = minimalBoundary.x;
-        else if (this.position.x < minimalBoundary.x) futureX = maxBoundary.x-1;
+        else if (this.position.x < minimalBoundary.x) futureX = maxBoundary.x;
         else futureX = this.position.x;
 
         if (this.position.y > maxBoundary.y ) futureY = minimalBoundary.y;
-        else if (this.position.y < minimalBoundary.y) futureY = maxBoundary.y-1;
+        else if (this.position.y < minimalBoundary.y) futureY = maxBoundary.y;
         else futureY = this.position.y;
 
         this.position = new Vector2d(futureX, futureY);
@@ -103,7 +103,7 @@ public class Animal implements IMapElement {
     }
 
     public boolean canCopulate() {
-        return this.energy >= this.maxEnergy && !this.copulated;
+        return this.energy >= this.maxEnergy/2 && !this.copulated;
     }
 
     public Animal copulate( Animal partner, Vector2d birthPlace) {

@@ -52,10 +52,10 @@ public class MapGUIVisualizer {
         Tile tile = new Tile(800 / this.map.getWidth(), 800 / this.map.getHeight(), color);
         tile.setTranslateX(obj.x * 800 / this.map.getWidth());
         tile.setTranslateY(obj.y * 800 / this.map.getHeight());
+
         this.root.getChildren().set(obj.x * map.getWidth() + obj.y, tile);
 
         // ((Rectangle) tile.getChildren().get(0)).setStroke(color);
-        System.out.println("Changed");
     }
 
 

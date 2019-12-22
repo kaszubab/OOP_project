@@ -32,7 +32,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class World extends Application {
     public static void main(String [] args) {
-        Animal.maxEnergy = 30;
+        Animal.maxEnergy = 500;
         /*
         try {
             MoveDirection[] directions = new OptionParser(args).getValidArgTable();
@@ -75,12 +75,21 @@ public class World extends Application {
     private Stage window;
     @Override
     public void start(Stage primaryStage) {
-        WorldMap map = new WorldMap(25,25,4, 10, 0);
-        map.place(new Animal(new Vector2d(2,2), 20));
-        map.place(new Animal(new Vector2d(8,8), 20));
-        map.place(new Animal(new Vector2d(5,7), 20));
-        map.place(new Animal(new Vector2d(11,9), 20));
-        map.place(new Animal(new Vector2d(19,21), 20));
+        WorldMap map = new WorldMap(50,50,10, 250, 1);
+        for (int i = 0; i < 50; i += 2) {
+            map.place(new Animal(new Vector2d(0+i,48 - i), 150));
+        }
+        for (int i = 0; i < 50; i += 2) {
+            map.place(new Animal(new Vector2d(0+i,0 + i), 150));
+        }
+        map.place(new Animal(new Vector2d(2,2), 150));
+        map.place(new Animal(new Vector2d(1,1), 150));
+        map.place(new Animal(new Vector2d(2,2), 150));
+        map.place(new Animal(new Vector2d(1,1), 150));
+        map.place(new Animal(new Vector2d(2,2), 150));
+        map.place(new Animal(new Vector2d(1,1), 150));
+
+
 
 
         MapGUIVisualizer visualizer = new MapGUIVisualizer(map);
@@ -90,7 +99,7 @@ public class World extends Application {
         window.setTitle("Evolution generator");
 
         AtomicInteger counter = new AtomicInteger();
-        Timeline timeline = new Timeline(new KeyFrame(javafx.util.Duration.seconds(0.5), new EventHandler<ActionEvent>() {
+        Timeline timeline = new Timeline(new KeyFrame(javafx.util.Duration.seconds(0.1), new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
                 window.setScene(new Scene(visualizer.getVisualization()));

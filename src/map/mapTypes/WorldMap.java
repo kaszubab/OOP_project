@@ -48,14 +48,13 @@ public class WorldMap extends AbstractWorldMap {
         this.height = height;
         this.plantEnergy = plantEnergy;
         this.moveCost = moveCost;
-
         this.jungleRightUpper = new Vector2d(width/2 + jungleSize/2, height/2 + jungleSize/2);
         this.jungleLeftLower = new Vector2d(width/2 - jungleSize/2, height/2 - jungleSize/2);
         this.mapVis = new MapVisualizer(this);
     }
 
     private boolean inMap(Vector2d position) {
-        return position.precedes(new Vector2d(width,height)) &&
+        return position.precedes(new Vector2d(width-1,height-1)) &&
                 position.follows(new Vector2d(0,0));
     }
 
@@ -173,6 +172,7 @@ public class WorldMap extends AbstractWorldMap {
             List<IMapElement> list = elementMap.get(animal.getPosition());
             if (list.size() <= 1) return;
             if ( ((Animal)list.get(0) ).canCopulate() && ( (Animal) list.get(1)).canCopulate() ) {
+                System.out.println("Children Born");
                 Vector2d placeForChildren = animal.getPosition();
                 for (int i = -1; i < 2; i++) {
                     for (int j = -1; j < 2; j++) {
@@ -181,14 +181,17 @@ public class WorldMap extends AbstractWorldMap {
                                 (!this.elementMap.containsKey(newPlaceForChildren) ||
                                  this.elementMap.get(newPlaceForChildren).size()  == 0)) {
                             placeForChildren = newPlaceForChildren;
+
                             Animal child =  ((Animal)list.get(0) ).copulate(( (Animal) list.get(1)), placeForChildren);
                             animalsToAdd.add(child);
+                            System.out.println("Children Born without parents");
                             return;
                         }
                     }
                 }
                 Animal child =  ((Animal)list.get(0) ).copulate(( (Animal) list.get(1)), placeForChildren);
                 animalsToAdd.add(child);
+                System.out.println("Children Born");
             }
         });
         animalsToAdd.forEach(x -> this.place(x));
@@ -206,8 +209,14 @@ public class WorldMap extends AbstractWorldMap {
         else if (this.elementMap.get(x).get(0) instanceof Grass) {
             visualizer.forEach( y -> y.recolorTile(x, Color.DARKGREEN));
         }
-        else {
+        else if ( ((Animal)this.elementMap.get(x).get(0)).energy > Animal.maxEnergy / 2) {
             visualizer.forEach( y -> y.recolorTile(x, Color.FUCHSIA));
+        }
+        else if ( ((Animal)this.elementMap.get(x).get(0)).energy > Animal.maxEnergy / 4) {
+            visualizer.forEach( y -> y.recolorTile(x, Color.BLUE));
+        }
+        else {
+            visualizer.forEach( y -> y.recolorTile(x, Color.RED));
         }
     }
 
@@ -218,7 +227,7 @@ public class WorldMap extends AbstractWorldMap {
 
     @Override
     protected Vector2d maxPoint() {
-        return new Vector2d(this.width, this.height);
+        return new Vector2d(this.width-1, this.height-1);
     }
 
 }
