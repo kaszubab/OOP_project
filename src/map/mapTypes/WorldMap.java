@@ -1,47 +1,33 @@
 package map.mapTypes;
 
 
-import javafx.geometry.Pos;
-import javafx.scene.Parent;
-import javafx.scene.layout.Background;
-import javafx.scene.layout.Pane;
-import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.Rectangle;
 import map.visualization.MapVisualizer;
 import mapElements.IMapElement;
 import mapElements.animals.Animal;
 import mapElements.otherElements.Grass;
 import mapElements.positionAndDirection.Vector2d;
+import org.omg.CORBA.PUBLIC_MEMBER;
 
-import javax.swing.*;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
-import java.util.Vector;
-import java.util.stream.Stream;
 
 
 public class WorldMap extends AbstractWorldMap {
 
-    public int getWidth() {
-        return width;
-    }
 
     private int width;
-
-    public int getHeight() {
-        return height;
-    }
-
     private int height;
     private int plantEnergy;
     private int moveCost;
 
-    protected Vector2d jungleRightUpper;
-    protected Vector2d jungleLeftLower;
+    Vector2d jungleRightUpper;
+    Vector2d jungleLeftLower;
+
     private LinkedList<IMapElement> grassList = new LinkedList<>();
     private List<MapGUIVisualizer> visualizer = new LinkedList<>();
+    private List<MapStatistics> statistics = new LinkedList<>();
 
     public WorldMap(int width, int height, int jungleSize, int plantEnergy, int moveCost) {
         this.width = width;
@@ -52,6 +38,8 @@ public class WorldMap extends AbstractWorldMap {
         this.jungleLeftLower = new Vector2d(width/2 - jungleSize/2, height/2 - jungleSize/2);
         this.mapVis = new MapVisualizer(this);
     }
+
+
 
     private boolean inMap(Vector2d position) {
         return position.precedes(new Vector2d(width-1,height-1)) &&
@@ -81,6 +69,9 @@ public class WorldMap extends AbstractWorldMap {
     public void run() {
         killAnimals();
         growGrass();
+        elementMap.forEach(this::recolorTile);
+        sendStatistics();
+        visualizer.forEach(MapGUIVisualizer::updateChart);
         for (Animal x : animalList) {
             x.move(this.minPoint(), this.maxPoint());
             x.changeEnergy(-moveCost);
@@ -103,7 +94,7 @@ public class WorldMap extends AbstractWorldMap {
         feedAnimals();
         bearChildren();
 
-        elementMap.forEach( (x,y) -> recolorTile(x, y) );
+
     }
 
     @Override
@@ -134,8 +125,8 @@ public class WorldMap extends AbstractWorldMap {
         grassList.removeAll(grassToBeRemoved);
     }
 
-    public void giveAnimalsFood(List<IMapElement> list,  IMapElement grass) {
-        list.remove(((Grass)grass));
+    private void giveAnimalsFood(List<IMapElement> list,  IMapElement grass) {
+        list.remove(grass);
 
         if (list.size() == 1) {
             ((Animal) list.get(0)).changeEnergy(this.plantEnergy);
@@ -172,7 +163,6 @@ public class WorldMap extends AbstractWorldMap {
             List<IMapElement> list = elementMap.get(animal.getPosition());
             if (list.size() <= 1) return;
             if ( ((Animal)list.get(0) ).canCopulate() && ( (Animal) list.get(1)).canCopulate() ) {
-                System.out.println("Children Born");
                 Vector2d placeForChildren = animal.getPosition();
                 for (int i = -1; i < 2; i++) {
                     for (int j = -1; j < 2; j++) {
@@ -184,18 +174,17 @@ public class WorldMap extends AbstractWorldMap {
 
                             Animal child =  ((Animal)list.get(0) ).copulate(( (Animal) list.get(1)), placeForChildren);
                             animalsToAdd.add(child);
-                            System.out.println("Children Born without parents");
                             return;
                         }
                     }
                 }
                 Animal child =  ((Animal)list.get(0) ).copulate(( (Animal) list.get(1)), placeForChildren);
                 animalsToAdd.add(child);
-                System.out.println("Children Born");
             }
         });
-        animalsToAdd.forEach(x -> this.place(x));
+        animalsToAdd.forEach(this::place);
     }
+
 
     public void addVisualizer (MapGUIVisualizer vis) {
         this.visualizer.add(vis);
@@ -218,6 +207,31 @@ public class WorldMap extends AbstractWorldMap {
         else {
             visualizer.forEach( y -> y.recolorTile(x, Color.RED));
         }
+    }
+
+
+    public void addStatistics(MapStatistics statistics) {
+        this.statistics.add(statistics);
+        statistics.createSnapshot(animalList.size(), grassList.size(), domineeringGenesArray());
+    }
+
+    private int [] domineeringGenesArray() {
+        int [] genesArray = new int [8];
+        animalList.forEach(x -> genesArray[x.getDomineeringGene()]++);
+        return genesArray;
+    }
+
+    private void sendStatistics() {
+        this.statistics.forEach(x-> x.createSnapshot(this.animalList.size(),
+                this.grassList.size(), this.domineeringGenesArray()));
+    }
+
+
+    public int getHeight() {
+        return height;
+    }
+    public int getWidth() {
+        return width;
     }
 
     @Override

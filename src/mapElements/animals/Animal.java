@@ -36,7 +36,7 @@ public class Animal implements IMapElement {
         this.position = initialPosition;
         this.observerList = new LinkedList<>();
         this.energy = startingEnergy;
-        this.DNA = new Genotype();
+        this.DNA = genes;
         this.pickDirection();
     }
 
@@ -101,6 +101,11 @@ public class Animal implements IMapElement {
     public int getChildren() {
         return children;
     }
+
+    public int getDomineeringGene() {
+        return this.DNA.getDomineeringGene();
+    }
+
 
     public boolean canCopulate() {
         return this.energy >= this.maxEnergy/2 && !this.copulated;

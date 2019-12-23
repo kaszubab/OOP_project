@@ -3,6 +3,7 @@ package mapElements.animals;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Random;
 
 public class Genotype {
@@ -10,6 +11,7 @@ public class Genotype {
     public final ArrayList<Integer> genes;
     private int genotypeSize = 32;
     private static final int genesTypes = 8;
+    private int domineeringGene;
 
     public Genotype() {
         Random r = new Random();
@@ -20,6 +22,7 @@ public class Genotype {
         checkGenes(r);
 
         Collections.sort(genes);
+        this.domineeringGene = computeDomineeringGene();
 
     }
 
@@ -36,8 +39,26 @@ public class Genotype {
         checkGenes(r);
 
         Collections.sort(genes);
+
+        this.domineeringGene = computeDomineeringGene();
+
+
     }
 
+    private int computeDomineeringGene () {
+        int [] array = new int[genesTypes];
+        genes.forEach(x -> array[x]++);
+
+        int max = -1, maxIndex = -1;
+        for (int i = 0; i < array.length; i++) {
+            if (array[i] > max) {
+                max = array[i];
+                maxIndex = i;
+            }
+        }
+
+        return maxIndex;
+    }
     private void checkGenes(Random rand) {
         for (int i = 0 ; i < genesTypes; i++) {
             if (!this.genes.contains(i)) {
@@ -52,6 +73,13 @@ public class Genotype {
             }
         }
     }
+
+
+    public int getDomineeringGene()
+    {
+        return this.domineeringGene;
+    }
+
 
     public int pickDirection() {
         Random r = new Random();
