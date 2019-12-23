@@ -71,7 +71,7 @@ public class WorldMap extends AbstractWorldMap {
         growGrass();
         elementMap.forEach(this::recolorTile);
         sendStatistics();
-        visualizer.forEach(MapGUIVisualizer::updateChart);
+        visualizer.forEach(MapGUIVisualizer::updateCharts);
         for (Animal x : animalList) {
             x.move(this.minPoint(), this.maxPoint());
             x.changeEnergy(-moveCost);

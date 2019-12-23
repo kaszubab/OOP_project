@@ -6,10 +6,10 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Pos;
+import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.SceneBuilder;
-import javafx.scene.chart.Chart;
-import javafx.scene.chart.PieChart;
+import javafx.scene.chart.*;
 import javafx.scene.control.Button;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
@@ -28,6 +28,7 @@ public class MapGUIVisualizer {
     private WorldMap map;
     private MapStatistics statistics;
     private Pane root;
+    private final int windowSize = 20;
 
     public MapGUIVisualizer(WorldMap map, MapStatistics statistics) {
         this.map = map;
@@ -39,7 +40,7 @@ public class MapGUIVisualizer {
     private void visualize() {
 
         Pane root = new Pane();
-        root.setPrefSize(800, 600);
+        root.setPrefSize(1200, 800);
 
 
 
@@ -48,14 +49,14 @@ public class MapGUIVisualizer {
                 Tile tile;
                 if ( i >= this.map.jungleLeftLower.x && i <= this.map.jungleRightUpper.x &&
                         j <= this.map.jungleRightUpper.y && j >= this.map.jungleLeftLower.y) {
-                    tile = new Tile(600 / this.map.getWidth(), 600 / this.map.getHeight(), Color.LIGHTGREEN);
+                    tile = new Tile(800 / this.map.getWidth(), 800 / this.map.getHeight(), Color.LIGHTGREEN);
                 }
                 else {
-                    tile = new Tile(600 / this.map.getWidth(), 600 / this.map.getHeight(), null);
+                    tile = new Tile(800 / this.map.getWidth(), 800 / this.map.getHeight(), null);
                 }
 
-                tile.setTranslateX(i * 600 / this.map.getWidth());
-                tile.setTranslateY(j * 600 / this.map.getHeight());
+                tile.setTranslateX(i * 800 / this.map.getWidth());
+                tile.setTranslateY(j * 800 / this.map.getHeight());
                 root.getChildren().add(tile);
             }
         }
@@ -67,11 +68,11 @@ public class MapGUIVisualizer {
     public void addButtons (Timeline timeline) {
 
         VBox box = new VBox();
-        box.setTranslateX(600);
+        box.setTranslateX(800);
 
         Button button1 = new Button();
         button1.setText("Pause");
-        button1.setPrefWidth(200);
+        button1.setPrefWidth(400);
         button1.setPrefHeight(50);
 
         button1.setOnAction(new EventHandler<ActionEvent>() {
@@ -83,7 +84,7 @@ public class MapGUIVisualizer {
 
         Button button2 = new Button();
         button2.setText("Start");
-        button2.setPrefWidth(200);
+        button2.setPrefWidth(400);
         button2.setPrefHeight(50);
 
         button2.setOnAction(new EventHandler<ActionEvent>() {
@@ -95,7 +96,9 @@ public class MapGUIVisualizer {
 
         box.getChildren().add(button1);
         box.getChildren().add(button2);
-        box.getChildren().add(addChart());
+        box.getChildren().add(addLineChart());
+        box.getChildren().add(addPieChart());
+
 
         this.root.getChildren().add(box);
     }
@@ -105,7 +108,7 @@ public class MapGUIVisualizer {
         return new Pane(root);
     }
 
-    private Chart addChart() {
+    private Chart addPieChart() {
         MapStatistics.MapData data = statistics.getMapData();
         ObservableList<PieChart.Data> pieChartData =
                 FXCollections.observableArrayList(
@@ -119,22 +122,68 @@ public class MapGUIVisualizer {
                         new PieChart.Data("7", data.domineeringGenes[7])
                 );
         final PieChart chart = new PieChart(pieChartData);
-        chart.setMaxWidth(200);
-        chart.setMaxHeight(300);
+        chart.setMaxWidth(400);
+        chart.setMaxHeight(350);
 
         chart.setTitle("Domineering Ganes");
         return chart;
     }
 
-    public void updateChart() {
-        ((VBox)this.root.getChildren().get(root.getChildren().size()-1)).getChildren().remove(2);
-        ((VBox)this.root.getChildren().get(root.getChildren().size()-1)).getChildren().add(addChart());
+    private Chart addLineChart() {
+
+        final CategoryAxis xAxis = new CategoryAxis();
+        final NumberAxis yAxis = new NumberAxis();
+
+        xAxis.setLabel("Time/s");
+        xAxis.setAnimated(false);
+        yAxis.setLabel("Quantity");
+        yAxis.setAnimated(false);
+
+        final LineChart<String, Number> lineChart = new LineChart<>(xAxis, yAxis);
+
+        lineChart.setMaxWidth(400);
+        lineChart.setMaxHeight(350);
+        lineChart.setTitle("Quantity Chart");
+        lineChart.setAnimated(false);
+
+        XYChart.Series<String, Number> animalSeries = new XYChart.Series<>();
+        XYChart.Series<String, Number> plantSeries = new XYChart.Series<>();
+
+
+        animalSeries.setName("Animals");
+        lineChart.getData().add(animalSeries);
+
+        plantSeries.setName("Plants");
+        lineChart.getData().add(plantSeries);
+
+        return lineChart;
+    }
+
+    private void  updateLineChart(Node chart) {
+        MapStatistics.MapData stats = statistics.getMapData();
+
+
+        if (stats.epoch % 10 != 0) return;
+        LineChart<String, Number> lineChart = (LineChart<String, Number>) chart;
+        if ( lineChart.getData().get(0).getData().size() >= windowSize) lineChart.getData().get(0).getData().remove(0);
+        if ( lineChart.getData().get(1).getData().size() >= windowSize) lineChart.getData().get(1).getData().remove(0);
+
+        lineChart.getData().get(0).getData().add(new XYChart.Data<>(Integer.toString(stats.epoch), stats.animalCount));
+        lineChart.getData().get(1).getData().add(new XYChart.Data<>(Integer.toString(stats.epoch), stats.grassCount));
+    }
+
+
+
+    public void updateCharts() {
+        updateLineChart(((VBox)this.root.getChildren().get(root.getChildren().size()-1)).getChildren().get(2));
+        ((VBox)this.root.getChildren().get(root.getChildren().size()-1)).getChildren().remove(3);
+        ((VBox)this.root.getChildren().get(root.getChildren().size()-1)).getChildren().add(addPieChart());
     }
 
     public void recolorTile (Vector2d obj, Color color) {
-        Tile tile = new Tile(600 / this.map.getWidth(), 600 / this.map.getHeight(), color);
-        tile.setTranslateX(obj.x * 600 / this.map.getWidth());
-        tile.setTranslateY(obj.y * 600 / this.map.getHeight());
+        Tile tile = new Tile(800 / this.map.getWidth(), 800 / this.map.getHeight(), color);
+        tile.setTranslateX(obj.x * 800 / this.map.getWidth());
+        tile.setTranslateY(obj.y * 800 / this.map.getHeight());
 
         this.root.getChildren().set(obj.x * map.getWidth() + obj.y , tile);
     }
