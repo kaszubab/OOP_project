@@ -20,6 +20,7 @@ public class Animal implements IMapElement {
     private int children = 0;
     public static int maxEnergy;
     public int energy;
+    private int age = 0;
     private boolean copulated;
 
     private LinkedList<IPositionChangeObserver> observerList;
@@ -86,6 +87,7 @@ public class Animal implements IMapElement {
 
         this.position = new Vector2d(futureX, futureY);
         this.copulated = false;
+        this.age++;
 
         positionChanged(oldPosition);
     }
@@ -120,6 +122,10 @@ public class Animal implements IMapElement {
         this.changeEnergy(-this.energy/4);
         partner.changeEnergy(-partner.energy/4);
         return newAnimal;
+    }
+
+    public int getAge() {
+        return age;
     }
 
 

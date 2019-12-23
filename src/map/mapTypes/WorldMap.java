@@ -69,9 +69,11 @@ public class WorldMap extends AbstractWorldMap {
     public void run() {
         killAnimals();
         growGrass();
+
         elementMap.forEach(this::recolorTile);
+
         sendStatistics();
-        visualizer.forEach(MapGUIVisualizer::updateCharts);
+
         for (Animal x : animalList) {
             x.move(this.minPoint(), this.maxPoint());
             x.changeEnergy(-moveCost);
@@ -212,7 +214,23 @@ public class WorldMap extends AbstractWorldMap {
 
     public void addStatistics(MapStatistics statistics) {
         this.statistics.add(statistics);
-        statistics.createSnapshot(animalList.size(), grassList.size(), domineeringGenesArray());
+        statistics.createSnapshot(animalList.size(), grassList.size(), domineeringGenesArray(), averageAge(), averageChildren());
+    }
+
+    private double averageAge() {
+        int sum = 0;
+        for (Animal animal : animalList) {
+            sum += animal.getAge();
+        }
+        return (sum*1.0) / (animalList.size()*(1.0));
+    }
+
+    private double averageChildren() {
+        int sum = 0;
+        for (Animal animal : animalList) {
+            sum += animal.getChildren();
+        }
+        return (sum*1.0) / (animalList.size()*(1.0));
     }
 
     private int [] domineeringGenesArray() {
@@ -223,7 +241,7 @@ public class WorldMap extends AbstractWorldMap {
 
     private void sendStatistics() {
         this.statistics.forEach(x-> x.createSnapshot(this.animalList.size(),
-                this.grassList.size(), this.domineeringGenesArray()));
+                this.grassList.size(), this.domineeringGenesArray(), this.averageAge(), this.averageChildren()));
     }
 
 

@@ -8,17 +8,15 @@ import javafx.event.EventHandler;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Parent;
-import javafx.scene.SceneBuilder;
 import javafx.scene.chart.*;
 import javafx.scene.control.Button;
-import javafx.scene.layout.HBox;
+import javafx.scene.control.TextArea;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.Box;
 import javafx.scene.shape.Rectangle;
-import map.mapTypes.WorldMap;
+import javafx.scene.text.Text;
 import mapElements.positionAndDirection.Vector2d;
 
 import java.util.Observable;
@@ -34,6 +32,7 @@ public class MapGUIVisualizer {
         this.map = map;
         this.statistics = statistics;
         this.map.addVisualizer(this);
+        statistics.addGUI(this);
         visualize();
     }
 
@@ -73,7 +72,7 @@ public class MapGUIVisualizer {
         Button button1 = new Button();
         button1.setText("Pause");
         button1.setPrefWidth(400);
-        button1.setPrefHeight(50);
+        button1.setPrefHeight(30);
 
         button1.setOnAction(new EventHandler<ActionEvent>() {
             @Override
@@ -85,7 +84,7 @@ public class MapGUIVisualizer {
         Button button2 = new Button();
         button2.setText("Start");
         button2.setPrefWidth(400);
-        button2.setPrefHeight(50);
+        button2.setPrefHeight(30);
 
         button2.setOnAction(new EventHandler<ActionEvent>() {
             @Override
@@ -94,10 +93,21 @@ public class MapGUIVisualizer {
             }
         });
 
+
+
         box.getChildren().add(button1);
         box.getChildren().add(button2);
+
+        MapStatistics.MapData data = statistics.getMapData();
+
+        Text area1 = new Text("Average life length "  + data.averageAge);
+        Text area2 = new Text("Average children count "  + data.averageChildren);
+
+        box.getChildren().add(area1);
+        box.getChildren().add(area2);
+
         box.getChildren().add(addLineChart());
-        box.getChildren().add(addPieChart());
+        box.getChildren().add(addPieChart(data));
 
 
         this.root.getChildren().add(box);
@@ -108,8 +118,8 @@ public class MapGUIVisualizer {
         return new Pane(root);
     }
 
-    private Chart addPieChart() {
-        MapStatistics.MapData data = statistics.getMapData();
+    private Chart addPieChart(MapStatistics.MapData data) {
+
         ObservableList<PieChart.Data> pieChartData =
                 FXCollections.observableArrayList(
                         new PieChart.Data("0", data.domineeringGenes[0]),
@@ -125,7 +135,7 @@ public class MapGUIVisualizer {
         chart.setMaxWidth(400);
         chart.setMaxHeight(350);
 
-        chart.setTitle("Domineering Ganes");
+        chart.setTitle("Domineering Genes");
         return chart;
     }
 
@@ -159,25 +169,31 @@ public class MapGUIVisualizer {
         return lineChart;
     }
 
-    private void  updateLineChart(Node chart) {
-        MapStatistics.MapData stats = statistics.getMapData();
+    private void  updateLineChart(Node chart, MapStatistics.MapData data) {
 
-
-        if (stats.epoch % 10 != 0) return;
+        if (data.epoch % 10 != 0) return;
         LineChart<String, Number> lineChart = (LineChart<String, Number>) chart;
         if ( lineChart.getData().get(0).getData().size() >= windowSize) lineChart.getData().get(0).getData().remove(0);
         if ( lineChart.getData().get(1).getData().size() >= windowSize) lineChart.getData().get(1).getData().remove(0);
 
-        lineChart.getData().get(0).getData().add(new XYChart.Data<>(Integer.toString(stats.epoch), stats.animalCount));
-        lineChart.getData().get(1).getData().add(new XYChart.Data<>(Integer.toString(stats.epoch), stats.grassCount));
+        lineChart.getData().get(0).getData().add(new XYChart.Data<>(Integer.toString(data.epoch), data.animalCount));
+        lineChart.getData().get(1).getData().add(new XYChart.Data<>(Integer.toString(data.epoch), data.grassCount));
     }
 
 
 
-    public void updateCharts() {
-        updateLineChart(((VBox)this.root.getChildren().get(root.getChildren().size()-1)).getChildren().get(2));
-        ((VBox)this.root.getChildren().get(root.getChildren().size()-1)).getChildren().remove(3);
-        ((VBox)this.root.getChildren().get(root.getChildren().size()-1)).getChildren().add(addPieChart());
+    public void updateCharts(MapStatistics.MapData mpDt) {
+
+
+        updateLineChart(((VBox)this.root.getChildren().get(root.getChildren().size()-1)).getChildren().get(4), mpDt);
+        ((VBox)this.root.getChildren().get(root.getChildren().size()-1)).getChildren().remove(5);
+        ((VBox)this.root.getChildren().get(root.getChildren().size()-1)).getChildren().add(addPieChart(mpDt));
+
+        Text area1 = new Text("Average life length "  + mpDt.averageAge);
+        Text area2 = new Text("Average children count "  + mpDt.averageChildren);
+
+        ((VBox)this.root.getChildren().get(root.getChildren().size()-1)).getChildren().set(2,area1);
+        ((VBox)this.root.getChildren().get(root.getChildren().size()-1)).getChildren().set(3,area2);
     }
 
     public void recolorTile (Vector2d obj, Color color) {

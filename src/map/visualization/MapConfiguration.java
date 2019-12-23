@@ -1,7 +1,7 @@
 package map.visualization;
 import org.json.simple.JSONObject;
 import java.io.FileReader;
-import java.util.SortedSet;
+
 
 public class MapConfiguration {
 
@@ -23,7 +23,6 @@ public class MapConfiguration {
         this.height = Math.toIntExact((long) jobj.get("height"));
         this.startEnergy = Math.toIntExact((long) jobj.get("startEnergy"));
         this.moveEnergy = Math.toIntExact((long) jobj.get("moveEnergy"));
-
         this.plantEnergy = Math.toIntExact((long) jobj.get("plantEnergy"));
         this.jungleRatio = (double) jobj.get("jungleRatio");
 
