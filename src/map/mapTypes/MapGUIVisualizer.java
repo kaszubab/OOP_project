@@ -19,6 +19,8 @@ import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
 import mapElements.positionAndDirection.Vector2d;
 
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.Observable;
 
 public class MapGUIVisualizer {
@@ -78,6 +80,17 @@ public class MapGUIVisualizer {
             @Override
             public void handle(ActionEvent event) {
                 timeline.pause();
+
+                try (FileWriter file = new FileWriter("historyData.json")) {
+
+                    file.write(statistics.statisticsToFile().toJSONString());
+                    file.flush();
+
+                } catch (IOException e) {
+
+                }
+
+
             }
         });
 

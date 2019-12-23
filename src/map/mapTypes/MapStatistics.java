@@ -1,5 +1,8 @@
 package map.mapTypes;
 
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -28,6 +31,33 @@ public class MapStatistics {
 
     public MapData getMapData() {
         return dataHistory.get(currentEpoch-2);
+    }
+
+    public JSONArray statisticsToFile() {
+
+        JSONArray dataList = new JSONArray();
+
+        for (MapData a : this.dataHistory) {
+            JSONObject epochData = new JSONObject();
+
+            epochData.put("averageAge", a.averageAge);
+            epochData.put("averageAge", a.epoch);
+            epochData.put("averageAge", a.averageChildren);
+            epochData.put("averageAge", a.animalCount);
+            epochData.put("averageAge", a.grassCount);
+
+            JSONObject genes1 = new JSONObject();
+            for (int i =0;i < a.domineeringGenes.length; i++) {
+                genes1.put(i, a.domineeringGenes[i]);
+            }
+
+            epochData.put("domineeringGenes", genes1);
+            dataList.add(epochData);
+
+
+        }
+
+        return dataList;
     }
 
     public void addGUI(MapGUIVisualizer GUI) {
