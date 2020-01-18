@@ -3,12 +3,21 @@ import javafx.animation.Timeline;
 import javafx.application.Application;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.Scene;
-import javafx.scene.layout.Pane;
-import javafx.scene.layout.VBox;
+import javafx.scene.control.TextField;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.*;
+import javafx.scene.paint.Color;
+import javafx.scene.paint.Paint;
+import javafx.scene.text.Font;
+import javafx.scene.text.Text;
+import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
 import javafx.scene.control.Button;
 import javafx.stage.Window;
+import javafx.stage.WindowEvent;
 import map.mapTypes.MapGUIVisualizer;
 import map.mapTypes.MapStatistics;
 import map.mapTypes.WorldMap;
@@ -17,6 +26,7 @@ import mapElements.animals.Animal;
 import mapElements.positionAndDirection.Vector2d;
 import org.omg.PortableInterceptor.SYSTEM_EXCEPTION;
 
+import java.awt.*;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.util.*;
@@ -128,14 +138,69 @@ public class World extends Application {
         MapGUIVisualizer visualizer1 = new MapGUIVisualizer(map1, statistics1);
 
         AtomicInteger counter1 = new AtomicInteger();
-        Timeline timeline1 = new Timeline(new KeyFrame(javafx.util.Duration.seconds(0.1), new EventHandler<ActionEvent>() {
+        Timeline timeline1 = new Timeline(new KeyFrame(javafx.util.Duration.seconds(0.05), new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
 
-                generator.setScene(new Scene(visualizer1.getVisualization()));
+
                 map1.run();
             }
         }));
+
+        generator.setScene(new Scene(visualizer1.getVisualization()));
+        generator.getScene().setOnMouseClicked(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent event) {
+
+                if (event.getSceneX() < 800) {
+                    int tilesX = (int) Math.floor(event.getSceneX() / (800 / map1.getWidth()));
+                    int tilesY = (int) Math.floor(event.getSceneY() / (800 / map1.getHeight()));
+                    System.out.println(tilesX + " " +tilesY);
+                    Animal clickedAnimal = map1.getAnimalInfo(tilesX, tilesY);
+
+                    if (clickedAnimal != null) {
+                        timeline1.stop();
+
+                        Stage animalStats = new Stage();
+                        animalStats.setTitle("Animal Stats");
+
+                        StackPane root = new StackPane();
+
+                        root.setBackground(Background.EMPTY);
+
+                        VBox textBox = new VBox();
+                        textBox.setPadding(new Insets(30, 30, 30, 30));
+
+                        Text text1 = new Text();
+                        text1.setFont(Font.font("Comic Sans MS",40));
+                        text1.setFill(Color.DARKGREEN);
+                        text1.setTextAlignment(TextAlignment.CENTER);
+                        text1.setText("Days lived : " + clickedAnimal.getAge()
+                        + "\n" + "Children born : " + clickedAnimal.getChildren() + "\n" + "Current energy : " + clickedAnimal.energy);
+
+                        textBox.getChildren().add(text1);
+                        root.getChildren().add(textBox);
+
+
+
+
+                        animalStats.setScene(new Scene(root));
+                        animalStats.setOnCloseRequest(new EventHandler<WindowEvent>() {
+                            @Override
+                            public void handle(WindowEvent event) {
+                                timeline1.play();
+                            }
+                        });
+
+                        animalStats.show();
+
+                    }
+
+
+
+                }
+            }
+        });
 
         visualizer1.addButtons(timeline1);
 

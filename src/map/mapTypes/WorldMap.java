@@ -70,8 +70,6 @@ public class WorldMap extends AbstractWorldMap {
         killAnimals();
         growGrass();
 
-        elementMap.forEach(this::recolorTile);
-
         sendStatistics();
 
         for (Animal x : animalList) {
@@ -95,6 +93,9 @@ public class WorldMap extends AbstractWorldMap {
 
         feedAnimals();
         bearChildren();
+
+        elementMap.forEach(this::recolorTile);
+
 
 
     }
@@ -242,6 +243,15 @@ public class WorldMap extends AbstractWorldMap {
     private void sendStatistics() {
         this.statistics.forEach(x-> x.createSnapshot(this.animalList.size(),
                 this.grassList.size(), this.domineeringGenesArray(), this.averageAge(), this.averageChildren()));
+    }
+
+
+    public Animal getAnimalInfo(int X, int Y) {
+        List<IMapElement> maybeAnimal = this.elementMap.get(new Vector2d(X,Y));
+        if (maybeAnimal != null && maybeAnimal.size() > 0 && maybeAnimal.get(0) instanceof Animal) {
+            return (Animal) maybeAnimal.get(0);
+        }
+        return null;
     }
 
 

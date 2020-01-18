@@ -4,6 +4,7 @@ import javafx.animation.Timeline;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
+import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
@@ -11,6 +12,7 @@ import javafx.scene.Parent;
 import javafx.scene.chart.*;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextArea;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
@@ -58,6 +60,7 @@ public class MapGUIVisualizer {
 
                 tile.setTranslateX(i * 800 / this.map.getWidth());
                 tile.setTranslateY(j * 800 / this.map.getHeight());
+
                 root.getChildren().add(tile);
             }
         }
@@ -128,7 +131,7 @@ public class MapGUIVisualizer {
 
 
     public Parent getVisualization() {
-        return new Pane(root);
+        return  new Pane(root);
     }
 
     private Chart addPieChart(MapStatistics.MapData data) {
